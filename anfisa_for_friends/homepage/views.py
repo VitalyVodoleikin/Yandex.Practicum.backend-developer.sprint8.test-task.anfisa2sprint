@@ -1,18 +1,37 @@
 from django.shortcuts import render
-from ice_cream.models import IceCream
+from ice_cream.models import IceCream, Category
 from django.db.models import Q
 
 
 def index(request):
     template = 'homepage/index.html'
 
-    # Запрос. Возьмём нужное. А ненужное не возьмём:
+    # Изначальный запрос 1. Возьмём нужное. А ненужное не возьмём:
     ice_cream_list = IceCream.objects.values(
             'id', 'title', 'description'
-        ).filter(Q(is_published=True) & (Q(is_on_main=True) | Q(title__contains='пломбир')))
+        ).filter(
+            Q(is_published=True) &
+            (Q(is_on_main=True) | Q(title__contains='пломбир'))
+            )[1:4]
     
-    # Полученный из БД QuerySet передаём в словарь контекста:
+    # # Запрос 2 для отработки сортировок
+    # categories = Category.objects.values(
+    #     'id', 'output_order', 'title'
+    # ).order_by(
+    #     # Сортируем записи по значению поля output_order,
+    #     # а если значения output_order у каких-то записей равны -
+    #     # сортируем эти записи по названию в алфавитном порядке.
+    #     'output_order', 'title'
+    # )
+
+    # Полученный из БД QuerySet по изначальному запросу 1 передаём в словарь контекста:
     context = {'ice_cream_list': ice_cream_list, }
+
+    # # Словарь context для отработки запроса 2 для сортировки
+    # context = {
+    #     'categories': categories
+    # }
+
     # Словарь контекста передаём в шаблон, рендерим HTML-страницу:
     return render(request, template, context)
 

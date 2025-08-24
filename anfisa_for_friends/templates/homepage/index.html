@@ -15,6 +15,12 @@
       <!-- <li>Описание: {{ ice_cream.description }}</li> -->
       <!-- <li>FK wrapper: {{ ice_cream.wrapper_id }}</li> -->
       <!-- <li>FK category: {{ ice_cream.category_id }}</li> -->
-    </ul> 
+    </ul>
   {% endfor %}
+  <!-- Для эксперимента запросов с сортировкой -->
+    {% comment %} {% for category in categories %}  
+      <p>ID: {{ category.id }}</p>
+      <p>{{ category.output_order }}</p>
+      <p>{{ category.title }}</p>  
+    {% endfor %} {% endcomment %}
 {% endblock %}
