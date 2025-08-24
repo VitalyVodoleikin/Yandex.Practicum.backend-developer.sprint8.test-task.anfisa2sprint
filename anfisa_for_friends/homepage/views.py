@@ -1,18 +1,15 @@
 from django.shortcuts import render
 from ice_cream.models import IceCream
+from django.db.models import Q
 
 
 def index(request):
     template = 'homepage/index.html'
+
     # Запрос. Возьмём нужное. А ненужное не возьмём:
-    
-    # Заключаем вызов методов в скобки
-    # (это стандартный способ переноса длинных строк в Python);
-    # каждый вызов пишем с новой строки, так проще читать код:
     ice_cream_list = IceCream.objects.values(
             'id', 'title', 'description'
-        # Исключи те объекты, у которых is_published=False:
-        ).exclude(is_published=False)
+        ).filter(Q(is_published=True) & (Q(is_on_main=True) | Q(title__contains='пломбир')))
     
     # Полученный из БД QuerySet передаём в словарь контекста:
     context = {'ice_cream_list': ice_cream_list, }
@@ -20,9 +17,117 @@ def index(request):
     return render(request, template, context)
 
 
-# ---
+# ----------
 # Для возврата только тех объектов, у которых в поле is_on_main указано True,
 # используется метод .filter(is_on_main__exact=True)
 # ---
 # Для исключения тех объектов, у которых is_published=False,
 # используется метод .exclude(is_published=False)
+# ---
+# Для объединения условий при выборке данных можно записать так:
+# IceCream.objects.values('id', 'title', 'description').filter(is_published=True, is_on_main=True)
+# или так:
+# IceCream.objects.filter(is_published=True).filter(is_on_main=True)
+
+
+# ----------
+# Пример использования Q-запросов
+# # --->
+# 
+# # homepage/views.py
+# # Для применения Q-объектов их нужно импортировать:
+# from django.db.models import Q
+# from django.shortcuts import render
+# from ice_cream.models import IceCream
+# 
+# def index(request):
+#     template_name = 'homepage/index.html'
+#     ice_cream_list = IceCream.objects.values(
+#         'id', 'title', 'description'
+#     ).filter(
+#         # Делаем запрос, объединяя два условия
+#         # через Q-объекты и оператор AND:
+#         Q(is_published=True) & Q(is_on_main=True)
+#     )
+#     context = {
+#         'ice_cream_list': ice_cream_list,
+#     }
+#     return render(request, template_name, context)
+# # <---
+
+
+# ----------
+# Пример использования логического оператора AND в запросах
+# # --->
+# 
+# SQL: получаем записи, у которых значения полей is_on_main и is_published равны TRUE:
+# SELECT "ice_cream_icecream"."id"
+# FROM "ice_cream_icecream"
+# WHERE ("ice_cream_icecream"."is_on_main" AND "ice_cream_icecream"."is_published");
+#  
+# Для такого запроса в ORM есть несколько вариантов:
+# 
+# # Вариант 1, через запятую в аргументах метода .filter():
+# IceCream.objects
+# .values('id')
+# .filter(is_published=True, is_on_main=True)
+# 
+# # Вариант 2, через Q-объекты:
+# IceCream.objects
+# .values('id')
+# .filter(Q(is_published=True) & Q(is_on_main=True))
+# 
+# # Вариант 3, дважды вызываем метод .filter();
+# # так обычно не пишут, но этот вариант тоже встречается:
+# IceCream.objects
+# .values('id')
+# .filter(is_published=True).filter(is_on_main=True)
+# # <---
+
+
+# ----------
+# Пример использования логического оператора OR в запорсах
+# # --->
+# 
+# SQL: получаем записи, у которых поле is_on_main ИЛИ поле is_published равно True:
+# SELECT "ice_cream_icecream"."id"       
+# FROM "ice_cream_icecream"
+# WHERE ("ice_cream_icecream"."is_on_main" OR "ice_cream_icecream"."is_published");
+# 
+# Django ORM:
+# 
+# # Можно так, через Q-объекты:
+# IceCream.objects
+# .values('id')
+# .filter(Q(is_published=True) | Q(is_on_main=True))
+# 
+# # А можно и так - более многословно, но зато без Q-объектов:
+# IceCream.objects.values('id').filter(is_published=True) 
+# | IceCream.objects.values('id').filter(is_on_main=True)
+# # <---
+
+
+# ----------
+# Пример использования логического оператора NOT в запросах
+# # --->
+# 
+# SQL: получаем записи, у которых поле is_published равно True
+# и одновременно поле is_on_main не равно False (НЕ НЕ равно True):
+#  SELECT "ice_cream_icecream"."id",
+#  FROM "ice_cream_icecream"
+#  WHERE ("ice_cream_icecream"."is_published" 
+#         AND NOT (NOT "ice_cream_icecream"."is_on_main")
+# 
+# Django ORM:
+# 
+# # Лучше так:
+# IceCream.objects
+# .values('id')
+# .filter(Q(is_published=True) & ~Q(is_on_main=False))
+# 
+# # Но сработает и так:
+# IceCream.objects
+# .values('id')
+# .filter(is_published=True)
+# .exclude(is_on_main=False)
+# # <---
