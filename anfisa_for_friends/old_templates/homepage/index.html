@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}
+  Анфиса для друзей. Главная
+{% endblock %}
+
+{% block content %}
+  <h1 class="pb-2 mb-0">Главная страница</h1>
+  {% for ice_cream in ice_cream_list %}
+    <!-- Выводим id и title объекта IceCream -->
+    <h3>{{ ice_cream.title }} ID: {{ ice_cream.id }}</h3> 
+    ...
+    <!-- Выводим поля связанного объекта Category -->
+    <p>Категория: {{ ice_cream.category.title }}</p>
+    <p>Слаг категории: {{ ice_cream.category.slug }}</p>
+  <p>Порядок отображения: {{ ice_cream.category.output_order }}</p>
+  {% endfor %} 
+{% endblock %} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %}
+
+{% block content %}
+  <h1 class="pb-2 mb-0">Главная страница</h1>
+  <!-- {{ ice_cream_list }} -->
+  {% for ice_cream in ice_cream_list %}
+    <ul>
+      <!-- <li>Опубликовано: {{ ice_cream.is_published }}</li> -->
+      <!-- <li>На главную: {{ ice_cream.is_on_main }}</li> -->
+      <li><h3>Название: {{ ice_cream.title }}</h3></li>
+      <li>ID: {{ ice_cream.id }}</li>
+      <li>{{ ice_cream.description }}</li>
+      <!-- <li>Описание: {{ ice_cream.description }}</li> -->
+      <!-- <li>FK wrapper: {{ ice_cream.wrapper_id }}</li> -->
+      <!-- <li>FK category: {{ ice_cream.category_id }}</li> -->
+    </ul>
+  {% endfor %}
+  <!-- Для эксперимента запросов с сортировкой -->
+    {% comment %} {% for category in categories %}  
+      <p>ID: {{ category.id }}</p>
+      <p>{{ category.output_order }}</p>
+      <p>{{ category.title }}</p>  
+    {% endfor %}
+{% endblock %}
+
+{% endcomment %}
