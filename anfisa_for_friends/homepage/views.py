@@ -6,14 +6,14 @@ from django.db.models import Q
 def index(request):
     template = 'homepage/index.html'
 
-    # Изначальный запрос 1. Возьмём нужное. А ненужное не возьмём:
-    ice_cream_list = IceCream.objects.values(
-            'id', 'title', 'description'
-        ).filter(
-            Q(is_published=True) &
-            (Q(is_on_main=True) | Q(title__contains='пломбир'))
-            )[1:4]
-    
+    # # Изначальный запрос 1. Возьмём нужное. А ненужное не возьмём:
+    # ice_cream_list = IceCream.objects.values(
+    #         'id', 'title', 'description'
+    #     ).filter(
+    #         Q(is_published=True) &
+    #         (Q(is_on_main=True) | Q(title__contains='пломбир'))
+    #         )[1:4]
+    # 
     # # Запрос 2 для отработки сортировок
     # categories = Category.objects.values(
     #     'id', 'output_order', 'title'
@@ -23,17 +23,35 @@ def index(request):
     #     # сортируем эти записи по названию в алфавитном порядке.
     #     'output_order', 'title'
     # )
+    # 
+    # # Запрос 3 (JOIN c помощью метода .values())
+    # ice_cream_list = IceCream.objects.values('id', 'title', 'category__title')
+    # # values(..., '<поле fk>__<поле в модели, связанной по fk>')
 
-    # Полученный из БД QuerySet по изначальному запросу 1 передаём в словарь контекста:
-    context = {'ice_cream_list': ice_cream_list, }
+    # Запрос 4 (JOIN c помощью .select_related())
+    ice_cream_list = IceCream.objects.select_related('category')
 
+
+    # # Полученный из БД QuerySet по изначальному запросу 1 
+    # # передаём в словарь контекста:
+    # context = {'ice_cream_list': ice_cream_list, }
+    # 
     # # Словарь context для отработки запроса 2 для сортировки
     # context = {
     #     'categories': categories
     # }
 
+    # Формирование словаря для запроса 3, 4
+    context = {
+        'ice_cream_list': ice_cream_list,
+    }
+
     # Словарь контекста передаём в шаблон, рендерим HTML-страницу:
     return render(request, template, context)
+
+
+
+
 
 
 # ----------

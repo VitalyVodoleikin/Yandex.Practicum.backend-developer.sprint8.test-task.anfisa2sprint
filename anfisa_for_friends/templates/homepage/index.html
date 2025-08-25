@@ -2,6 +2,44 @@
 {% block title %}
   Анфиса для друзей. Главная
 {% endblock %}
+
+{% block content %}
+  <h1 class="pb-2 mb-0">Главная страница</h1>
+  {% for ice_cream in ice_cream_list %}
+    <!-- Выводим id и title объекта IceCream -->
+    <h3>{{ ice_cream.title }} ID: {{ ice_cream.id }}</h3> 
+    ...
+    <!-- Выводим поля связанного объекта Category -->
+    <p>Категория: {{ ice_cream.category.title }}</p>
+    <p>Слаг категории: {{ ice_cream.category.slug }}</p>
+  <p>Порядок отображения: {{ ice_cream.category.output_order }}</p>
+  {% endfor %} 
+{% endblock %} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %}
+
 {% block content %}
   <h1 class="pb-2 mb-0">Главная страница</h1>
   <!-- {{ ice_cream_list }} -->
@@ -22,5 +60,7 @@
       <p>ID: {{ category.id }}</p>
       <p>{{ category.output_order }}</p>
       <p>{{ category.title }}</p>  
-    {% endfor %} {% endcomment %}
+    {% endfor %}
 {% endblock %}
+
+{% endcomment %}
